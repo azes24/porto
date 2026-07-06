@@ -154,7 +154,21 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/supabase-config.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://xufdsahxomccepetmdgu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_7Kv04furGIBlg3rkDqIZfA_Y3OrWWaJ';
+    const SUPABASE_BUCKET = 'portfolio-images';
+    let _sb = null;
+    function getSupabase() {
+      if (!_sb && SUPABASE_URL !== 'ISI_SUPABASE_URL_DISINI') {
+        _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+      return _sb;
+    }
+    function isSupabaseConfigured() {
+      return SUPABASE_URL !== 'ISI_SUPABASE_URL_DISINI' && SUPABASE_ANON_KEY !== 'ISI_SUPABASE_ANON_KEY_DISINI';
+    }
+  </script>
   <script src="assets/js/script.js"></script>
 </body>
 
