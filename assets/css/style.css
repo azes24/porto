@@ -399,6 +399,7 @@ button, input, textarea { cursor: none; font-family: inherit; }
   z-index: 1;
   display: flex;
   align-items: flex-end;
+  justify-content: center;
   gap: 2rem;
   max-width: 960px;
   width: 100%;
