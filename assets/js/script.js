@@ -327,6 +327,37 @@
     setTimeout(checkNew, 100);
   }
 
+  function updateHeroGrid(experiences) {
+    var grid = document.getElementById('expGrid');
+    if (!grid) return;
+    
+    // Take up to 4 experiences
+    var topExps = experiences.slice(0, 4);
+    
+    // Default placeholders if less than 4
+    var placeholders = [
+      { title: 'Project 01', img: 'assets/img/exp-1.png' },
+      { title: 'Project 02', img: 'assets/img/exp-2.png' },
+      { title: 'Project 03', img: 'assets/img/exp-3.png' },
+      { title: 'Project 04', img: 'assets/img/exp-1.png' }
+    ];
+    
+    var html = '';
+    for (var i = 0; i < 4; i++) {
+      var exp = topExps[i];
+      var title = exp ? exp.title : placeholders[i].title;
+      var img = (exp && exp.images && exp.images.length > 0) ? exp.images[0] : placeholders[i].img;
+      
+      html += '<div class="exp-grid-item" data-index="' + i + '">' +
+                '<img src="' + img + '" alt="' + title + '" loading="lazy">' +
+                '<div class="exp-grid-overlay">' +
+                  '<span>' + title + '</span>' +
+                '</div>' +
+              '</div>';
+    }
+    grid.innerHTML = html;
+  }
+
   // Try loading from Supabase, fallback to dummy
   async function loadExperiences() {
     if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
@@ -339,15 +370,19 @@
         
         if (!error && data && data.length > 0) {
           renderExperiences(data);
+          updateHeroGrid(data);
         } else {
           renderExperiences(dummyExperiences);
+          updateHeroGrid(dummyExperiences);
         }
       } catch (e) {
         console.warn('Supabase error, using fallback data:', e);
         renderExperiences(dummyExperiences);
+        updateHeroGrid(dummyExperiences);
       }
     } else {
       renderExperiences(dummyExperiences);
+      updateHeroGrid(dummyExperiences);
     }
   }
 

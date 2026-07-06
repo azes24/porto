@@ -494,7 +494,8 @@ button, input, textarea { cursor: none; font-family: inherit; }
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.85rem;
-  flex: 1;
+  flex: 0.85;
+  max-width: 420px;
   align-self: center;
 }
 
