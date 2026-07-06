@@ -1,0 +1,16 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/(.*)\\.php",
+      "destination": "/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)/index\\.html",
+      "destination": "/$1",
+      "permanent": true
+    }
+  ]
+}
