@@ -259,7 +259,7 @@
       return;
     }
 
-    var isExperiencesPage = window.location.pathname.includes('experiences.html');
+    var isExperiencesPage = document.body.getAttribute('data-page') === 'experiences';
     var itemsPerPage = 10;
     var maxItems = isExperiencesPage ? itemsPerPage : 3;
     var startIndex = isExperiencesPage ? (page - 1) * itemsPerPage : 0;
