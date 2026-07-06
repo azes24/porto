@@ -59,6 +59,13 @@
     .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,0.2); border-top-color:#fff; border-radius:50%; animation:spin 0.6s linear infinite; display:inline-block; vertical-align:middle; margin-right:8px; }
     @keyframes spin { to { transform:rotate(360deg); } }
     .empty-state { text-align:center; padding:3rem; color:var(--text-secondary); }
+    .btn-primary { background:var(--accent-blue); border-color:var(--accent-blue); color:#fff; padding:0.5rem 1rem; font-size:0.8rem; }
+    .btn-primary:hover { background:rgba(59,130,246,0.8); transform:translateY(-1px); }
+    .modal-overlay-edit { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,10,15,0.85); backdrop-filter:blur(8px); z-index:10000; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:all 0.3s; }
+    .modal-overlay-edit.active { opacity:1; visibility:visible; }
+    .modal-content-edit { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:2rem; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative; transform:scale(0.95); transition:all 0.3s; }
+    .modal-overlay-edit.active .modal-content-edit { transform:scale(1); }
+    .modal-close-edit { position:absolute; top:15px; right:20px; background:transparent; border:none; color:var(--text-primary); font-size:1.5rem; cursor:pointer; }
     .empty-state svg { opacity:0.3; margin-bottom:1rem; }
     @media(max-width:768px) { .form-grid { grid-template-columns:1fr; } }
   </style>
@@ -147,6 +154,48 @@
     </main>
   </div>
 
+  <!-- Edit Modal -->
+  <div class="modal-overlay-edit" id="editModal">
+    <div class="modal-content-edit">
+      <button class="modal-close-edit" onclick="closeEditModal()">&times;</button>
+      <h3 style="margin-bottom:1.5rem;">Edit Experience</h3>
+      <form id="editForm" class="form-grid">
+        <input type="hidden" id="e-id">
+        <div>
+          <label class="form-label">Title</label>
+          <input type="text" id="e-title" class="input" required>
+        </div>
+        <div>
+          <label class="form-label">Company / Organization</label>
+          <input type="text" id="e-company" class="input" required>
+        </div>
+        <div class="full-width">
+          <label class="form-label">Location</label>
+          <input type="text" id="e-location" class="input" required>
+        </div>
+        <div class="full-width">
+          <label class="form-label">Description</label>
+          <textarea id="e-desc" class="input" rows="3" required></textarea>
+        </div>
+        <div class="full-width">
+          <label class="form-label">Current Images</label>
+          <div class="preview-grid" id="editExistingPreviewGrid" style="margin-bottom:1rem;"></div>
+          
+          <label class="form-label">Add New Images</label>
+          <div class="upload-zone" onclick="document.getElementById('e-files').click()" style="padding:1.5rem;">
+            <p style="font-size:0.85rem; margin:0;">Click to add more images</p>
+          </div>
+          <input type="file" id="e-files" accept="image/*" multiple style="display:none;">
+          <div class="preview-grid" id="editNewPreviewGrid"></div>
+        </div>
+        <div class="full-width" style="text-align:right; margin-top:1rem;">
+          <button type="button" class="btn" style="background:transparent; border-color:var(--border);" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn" id="editSubmitBtn" style="margin-left:0.5rem; min-width:120px;">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -208,6 +257,7 @@
     }
 
     // ─── Load Experiences ───
+    let currentExperiencesData = [];
     async function loadDashboardExperiences() {
       const list = document.getElementById('expList');
       if (!configured) {
@@ -222,6 +272,7 @@
           list.innerHTML = '<div class="empty-state"><p>Belum ada experience. Tambahkan yang pertama!</p></div>';
           return;
         }
+        currentExperiencesData = data;
         list.innerHTML = '';
         data.forEach(exp => {
           const thumb = exp.images && exp.images.length > 0 ? exp.images[0] : '';
@@ -230,7 +281,10 @@
           div.innerHTML =
             (thumb ? '<img class="exp-list-thumb" src="' + thumb + '">' : '<div class="exp-list-thumb" style="display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--text-secondary);">No img</div>') +
             '<div class="exp-list-info"><h4>' + exp.title + '</h4><p>' + exp.company + ' · ' + exp.location + '</p></div>' +
-            '<button class="btn btn-danger" onclick="deleteExp(\'' + exp.id + '\')">Delete</button>';
+            '<div style="display:flex; gap:0.5rem;">' +
+              '<button class="btn btn-primary" onclick="openEditModal(\'' + exp.id + '\')">Edit</button>' +
+              '<button class="btn btn-danger" onclick="deleteExp(\'' + exp.id + '\')">Delete</button>' +
+            '</div>';
           list.appendChild(div);
         });
       } catch (e) {
@@ -288,6 +342,123 @@
       } finally {
         btn.disabled = false;
         btn.innerHTML = 'Add Experience';
+      }
+    });
+
+    // ─── Edit Experience Logic ───
+    let editSelectedFiles = [];
+    let editExistingImages = [];
+
+    function openEditModal(id) {
+      const exp = currentExperiencesData.find(e => e.id === id);
+      if (!exp) return;
+
+      document.getElementById('e-id').value = exp.id;
+      document.getElementById('e-title').value = exp.title;
+      document.getElementById('e-company').value = exp.company;
+      document.getElementById('e-location').value = exp.location;
+      document.getElementById('e-desc').value = exp.description;
+      
+      editExistingImages = exp.images ? [...exp.images] : [];
+      editSelectedFiles = [];
+      
+      renderEditExistingPreviews();
+      renderEditNewPreviews();
+      
+      document.getElementById('editModal').classList.add('active');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('active');
+    }
+
+    function renderEditExistingPreviews() {
+      const grid = document.getElementById('editExistingPreviewGrid');
+      grid.innerHTML = '';
+      if (editExistingImages.length === 0) {
+        grid.innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary);">No existing images</p>';
+        return;
+      }
+      editExistingImages.forEach((imgUrl, i) => {
+        const div = document.createElement('div');
+        div.className = 'preview-item';
+        div.innerHTML = '<img src="' + imgUrl + '"><button class="preview-remove" type="button" title="Remove">&times;</button>';
+        div.querySelector('.preview-remove').onclick = () => {
+          editExistingImages.splice(i, 1);
+          renderEditExistingPreviews();
+        };
+        grid.appendChild(div);
+      });
+    }
+
+    const editFileInput = document.getElementById('e-files');
+    const editNewPreviewGrid = document.getElementById('editNewPreviewGrid');
+
+    editFileInput.addEventListener('change', function(e) {
+      const newFiles = Array.from(e.target.files);
+      editSelectedFiles = editSelectedFiles.concat(newFiles);
+      renderEditNewPreviews();
+    });
+
+    function renderEditNewPreviews() {
+      editNewPreviewGrid.innerHTML = '';
+      editSelectedFiles.forEach((file, i) => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const div = document.createElement('div');
+          div.className = 'preview-item';
+          div.innerHTML = '<img src="' + e.target.result + '"><button class="preview-remove" type="button">&times;</button>';
+          div.querySelector('.preview-remove').onclick = () => {
+            editSelectedFiles.splice(i, 1);
+            renderEditNewPreviews();
+          };
+          editNewPreviewGrid.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById('editForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('editSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Saving...';
+
+      try {
+        const sb = getSupabase();
+        let finalImageUrls = [...editExistingImages];
+
+        // Upload new images to storage
+        for (const file of editSelectedFiles) {
+          const fileName = Date.now() + '_' + Math.random().toString(36).substr(2,9) + '_' + file.name;
+          const { data: upData, error: upErr } = await sb.storage.from(SUPABASE_BUCKET).upload(fileName, file);
+          if (upErr) throw upErr;
+          const { data: urlData } = sb.storage.from(SUPABASE_BUCKET).getPublicUrl(fileName);
+          finalImageUrls.push(urlData.publicUrl);
+        }
+
+        // Update record
+        const id = document.getElementById('e-id').value;
+        const { error: updateErr } = await sb.from('experiences').update({
+          title: document.getElementById('e-title').value,
+          company: document.getElementById('e-company').value,
+          location: document.getElementById('e-location').value,
+          description: document.getElementById('e-desc').value,
+          images: finalImageUrls
+        }).eq('id', id);
+
+        if (updateErr) throw updateErr;
+
+        showToast('Experience berhasil diupdate!', 'success');
+        closeEditModal();
+        loadDashboardExperiences();
+
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Save Changes';
       }
     });
 
