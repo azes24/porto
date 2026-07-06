@@ -252,7 +252,7 @@
     }
   ];
 
-  function renderExperiences(experiences) {
+  function renderExperiences(experiences, page = 1) {
     container.innerHTML = '';
     if (experiences.length === 0) {
       container.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 3rem;">Belum ada experience yang ditambahkan.</p>';
@@ -260,8 +260,11 @@
     }
 
     var isExperiencesPage = window.location.pathname.includes('experiences.html');
-    var maxItems = isExperiencesPage ? experiences.length : 3;
-    var displayedExperiences = experiences.slice(0, maxItems);
+    var itemsPerPage = 10;
+    var maxItems = isExperiencesPage ? itemsPerPage : 3;
+    var startIndex = isExperiencesPage ? (page - 1) * itemsPerPage : 0;
+    var endIndex = isExperiencesPage ? startIndex + itemsPerPage : maxItems;
+    var displayedExperiences = experiences.slice(startIndex, endIndex);
 
     displayedExperiences.forEach(function (exp, index) {
       var card = document.createElement('div');
@@ -323,6 +326,44 @@
       showMoreDiv.className = 'reveal';
       showMoreDiv.innerHTML = '<a href="experiences.html" class="btn" style="padding: 0.75rem 2rem;">Show More ..</a>';
       container.appendChild(showMoreDiv);
+    } else if (isExperiencesPage) {
+      var totalPages = Math.ceil(experiences.length / itemsPerPage);
+      if (totalPages > 1) {
+        var paginationDiv = document.createElement('div');
+        paginationDiv.style.display = 'flex';
+        paginationDiv.style.justifyContent = 'center';
+        paginationDiv.style.gap = '0.5rem';
+        paginationDiv.style.marginTop = '3rem';
+        
+        for (var p = 1; p <= totalPages; p++) {
+          var btn = document.createElement('button');
+          btn.textContent = p;
+          btn.className = 'btn';
+          btn.style.padding = '0.5rem 1rem';
+          if (p === page) {
+            btn.style.background = 'var(--accent-purple)';
+            btn.style.borderColor = 'var(--accent-purple)';
+          } else {
+            btn.style.background = 'transparent';
+          }
+          
+          btn.onclick = (function(pageNum) {
+            return function() {
+              renderExperiences(experiences, pageNum);
+              // scroll up a bit to show from the top of the list
+              const section = document.getElementById('experience');
+              if (section) {
+                const yOffset = -80; // offset for navbar
+                const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+              }
+            };
+          })(p);
+          
+          paginationDiv.appendChild(btn);
+        }
+        container.appendChild(paginationDiv);
+      }
     }
 
     // Re-run scroll reveal for newly created elements
