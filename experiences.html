@@ -25,86 +25,17 @@
     <div class="container nav-inner">
       <a href="#" class="nav-logo gradient-text">AZIZSY.</a>
       <div class="nav-links">
-        <a href="#about">About</a>
-        <a href="experiences.html">Experience</a>
-        <a href="#contact">Contact</a>
+        <a href="/index.html#about">About</a>
+        <a href="experiences.html" class="active">Experience</a>
+        <a href="/index.html#contact">Contact</a>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section class="hero" id="about">
-    <div class="hero-orb hero-orb-1"></div>
-    <div class="hero-orb hero-orb-2"></div>
-    <div class="hero-content">
-      <h1 class="gradient-text">Building Digital<br>Experiences That Wow</h1>
-      <p>Creative Developer &amp; Designer crafting high-performance, interactive, and beautiful web applications.</p>
-    </div>
 
-    <!-- Hero Showcase: Profile + Experience Grid -->
-    <div class="hero-showcase reveal">
-      <!-- Profile Photo (Left) — natural cutout, no frame -->
-      <div class="profile-card" id="profileCard">
-        <div class="profile-photo" id="profileFrame">
-          <img src="assets/img/profil (0).png" alt="Profile Photo" class="profile-img active" data-index="0">
-          <img src="assets/img/profil (1).png" alt="Profile Photo" class="profile-img" data-index="1">
-          <img src="assets/img/profil (2).png" alt="Profile Photo" class="profile-img" data-index="2">
-          <div class="profile-fade"></div>
-        </div>
-        <div class="profile-dots" id="profileDots">
-          <span class="profile-dot active" data-index="0"></span>
-          <span class="profile-dot" data-index="1"></span>
-          <span class="profile-dot" data-index="2"></span>
-        </div>
-      </div>
-
-      <!-- Experience Photo Grid (Right) -->
-      <div class="exp-grid" id="expGrid">
-        <div class="exp-grid-item" data-index="0">
-          <img src="assets/img/exp-1.png" alt="Experience 1" loading="lazy">
-          <div class="exp-grid-overlay">
-            <span>Project 01</span>
-          </div>
-        </div>
-        <div class="exp-grid-item" data-index="1">
-          <img src="assets/img/exp-2.png" alt="Experience 2" loading="lazy">
-          <div class="exp-grid-overlay">
-            <span>Project 02</span>
-          </div>
-        </div>
-        <div class="exp-grid-item" data-index="2">
-          <img src="assets/img/exp-3.png" alt="Experience 3" loading="lazy">
-          <div class="exp-grid-overlay">
-            <span>Project 03</span>
-          </div>
-        </div>
-        <div class="exp-grid-item" data-index="3">
-          <img src="assets/img/exp-1.png" alt="Experience 4" loading="lazy">
-          <div class="exp-grid-overlay">
-            <span>Project 04</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Wave Curve Divider -->
-    <div class="hero-wave">
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.6" />
-            <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.6" />
-          </linearGradient>
-        </defs>
-        <path d="M0,85 C360,15 720,130 1440,55 L1440,120 L0,120 Z" fill="#000000"/>
-        <path d="M0,85 C360,15 720,130 1440,55" fill="none" stroke="url(#waveGrad)" stroke-width="3"/>
-      </svg>
-    </div>
-  </section>
 
   <!-- Experience Section -->
-  <section class="section" id="experience">
+  <section class="section" id="experience" style="padding-top: 8rem; min-height: 80vh;">
     <div class="container">
       <div class="section-header reveal">
         <h2 class="gradient-text">My Experience</h2>
@@ -116,30 +47,7 @@
     </div>
   </section>
 
-  <!-- Contact Section -->
-  <section class="contact-section" id="contact">
-    <div class="glass contact-card reveal-scale">
-      <h2 class="gradient-text">Let's Work Together</h2>
-      <p>Interested in collaborating or have a project in mind? Drop me a message.</p>
-      <form class="contact-form"
-        onsubmit="event.preventDefault(); const name = document.getElementById('name').value; const email = document.getElementById('email').value; const message = document.getElementById('message').value; const subject = encodeURIComponent('Contact from ' + name + ' by Portofolio'); const body = encodeURIComponent(message + '\n\nFrom: ' + email); window.open('https://mail.google.com/mail/?view=cm&fs=1&to=f.azizsyaifuddin@gmail.com&su=' + subject + '&body=' + body, '_blank');">
-        <div>
-          <label for="name">Name</label>
-          <input type="text" id="name" name="name" class="input" placeholder="Your name" required>
-        </div>
-        <div>
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" class="input" placeholder="you@example.com" required>
-        </div>
-        <div>
-          <label for="message">Message</label>
-          <textarea id="message" name="message" class="input" rows="4" placeholder="Tell me about your project..."
-            required></textarea>
-        </div>
-        <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;">Send Message</button>
-      </form>
-    </div>
-  </section>
+
 
   <!-- Modal Popup for Experience -->
   <div class="modal-overlay" id="expModal">

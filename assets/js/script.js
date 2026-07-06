@@ -259,7 +259,11 @@
       return;
     }
 
-    experiences.forEach(function (exp, index) {
+    var isExperiencesPage = window.location.pathname.includes('experiences.html');
+    var maxItems = isExperiencesPage ? experiences.length : 3;
+    var displayedExperiences = experiences.slice(0, maxItems);
+
+    displayedExperiences.forEach(function (exp, index) {
       var card = document.createElement('div');
       card.className = 'glass exp-card reveal';
       card.style.transitionDelay = (index * 0.15) + 's';
@@ -311,6 +315,15 @@
 
       container.appendChild(card);
     });
+
+    if (!isExperiencesPage && experiences.length > 3) {
+      var showMoreDiv = document.createElement('div');
+      showMoreDiv.style.textAlign = 'center';
+      showMoreDiv.style.marginTop = '2.5rem';
+      showMoreDiv.className = 'reveal';
+      showMoreDiv.innerHTML = '<a href="experiences.html" class="btn" style="padding: 0.75rem 2rem;">Show More ..</a>';
+      container.appendChild(showMoreDiv);
+    }
 
     // Re-run scroll reveal for newly created elements
     var newReveals = container.querySelectorAll('.reveal');
