@@ -222,13 +222,13 @@
 })();
 
 
-// ─── EXPERIENCE DATA LOADER ────────────────────
+// ─── EXPERIENCE DATA LOADER (Supabase + Fallback) ────
 (function initExperiences() {
   var container = document.getElementById('experience-container');
   if (!container) return;
 
-  // Dummy data (replace with Supabase later)
-  var experiences = [
+  // Fallback dummy data (used when Supabase is not configured)
+  var dummyExperiences = [
     {
       title: 'Senior Frontend Developer',
       company: 'Tech Corp',
@@ -252,64 +252,110 @@
     }
   ];
 
-  container.innerHTML = '';
-  experiences.forEach(function (exp, index) {
-    var card = document.createElement('div');
-    card.className = 'glass exp-card reveal';
-    card.style.transitionDelay = (index * 0.15) + 's';
-    card.style.cursor = 'none'; // Keep custom cursor
-    var coverImage = exp.images && exp.images.length > 0 ? exp.images[0] : '';
-    
-    card.innerHTML =
-      '<div class="exp-card-inner">' +
-        '<div class="exp-image">' +
-          '<img src="' + coverImage + '" alt="' + exp.title + '" loading="lazy">' +
-        '</div>' +
-        '<div class="exp-body">' +
-          '<div class="exp-header">' +
-            '<div>' +
-              '<h3 class="exp-title">' + exp.title + '</h3>' +
-              '<h4 class="exp-company">' + exp.company + '</h4>' +
+  function renderExperiences(experiences) {
+    container.innerHTML = '';
+    if (experiences.length === 0) {
+      container.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 3rem;">Belum ada experience yang ditambahkan.</p>';
+      return;
+    }
+
+    experiences.forEach(function (exp, index) {
+      var card = document.createElement('div');
+      card.className = 'glass exp-card reveal';
+      card.style.transitionDelay = (index * 0.15) + 's';
+      card.style.cursor = 'none';
+      var coverImage = exp.images && exp.images.length > 0 ? exp.images[0] : '';
+      
+      card.innerHTML =
+        '<div class="exp-card-inner">' +
+          '<div class="exp-image">' +
+            (coverImage ? '<img src="' + coverImage + '" alt="' + exp.title + '" loading="lazy">' : '<div style="width:100%;height:100%;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;color:var(--text-secondary);font-size:0.9rem;">No Image</div>') +
+          '</div>' +
+          '<div class="exp-body">' +
+            '<div class="exp-header">' +
+              '<div>' +
+                '<h3 class="exp-title">' + exp.title + '</h3>' +
+                '<h4 class="exp-company">' + exp.company + '</h4>' +
+              '</div>' +
             '</div>' +
+            '<div class="exp-location">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>' +
+              '<span>' + exp.location + '</span>' +
+            '</div>' +
+            '<p class="exp-desc">' + exp.description + '</p>' +
           '</div>' +
-          '<div class="exp-location">' +
-            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>' +
-            '<span>' + exp.location + '</span>' +
-          '</div>' +
-          '<p class="exp-desc">' + exp.description + '</p>' +
-        '</div>' +
-      '</div>';
-    
-    // Add Click Listener for Modal
-    card.addEventListener('click', function() {
-      const modal = document.getElementById('expModal');
-      if (modal) {
-        // Populate gallery
-        const gallery = document.getElementById('modalGallery');
-        gallery.innerHTML = '';
-        if (exp.images && exp.images.length > 0) {
-          exp.images.forEach(function(imgSrc) {
-            const img = document.createElement('img');
-            img.src = imgSrc;
-            gallery.appendChild(img);
-          });
+        '</div>';
+      
+      // Add Click Listener for Modal
+      card.addEventListener('click', function() {
+        var modal = document.getElementById('expModal');
+        if (modal) {
+          var gallery = document.getElementById('modalGallery');
+          gallery.innerHTML = '';
+          if (exp.images && exp.images.length > 0) {
+            exp.images.forEach(function(imgSrc) {
+              var img = document.createElement('img');
+              img.src = imgSrc;
+              gallery.appendChild(img);
+            });
+          }
+          
+          document.getElementById('modalTitle').textContent = exp.title;
+          document.getElementById('modalCompany').textContent = exp.company;
+          document.getElementById('modalLocation').textContent = exp.location;
+          document.getElementById('modalDesc').textContent = exp.description;
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
         }
-        
-        document.getElementById('modalTitle').textContent = exp.title;
-        document.getElementById('modalCompany').textContent = exp.company;
-        document.getElementById('modalLocation').textContent = exp.location;
-        document.getElementById('modalDesc').textContent = exp.description;
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Prevent scrolling
-      }
+      });
+
+      container.appendChild(card);
     });
 
-    container.appendChild(card);
-  });
+    // Re-run scroll reveal for newly created elements
+    var newReveals = container.querySelectorAll('.reveal');
+    function checkNew() {
+      for (var i = 0; i < newReveals.length; i++) {
+        var el = newReveals[i];
+        var top = el.getBoundingClientRect().top;
+        if (top < window.innerHeight * 0.85) {
+          el.classList.add('visible');
+        }
+      }
+    }
+    window.addEventListener('scroll', checkNew);
+    setTimeout(checkNew, 100);
+  }
+
+  // Try loading from Supabase, fallback to dummy
+  async function loadExperiences() {
+    if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
+      try {
+        var sb = getSupabase();
+        var { data, error } = await sb
+          .from('experiences')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (!error && data && data.length > 0) {
+          renderExperiences(data);
+        } else {
+          renderExperiences(dummyExperiences);
+        }
+      } catch (e) {
+        console.warn('Supabase error, using fallback data:', e);
+        renderExperiences(dummyExperiences);
+      }
+    } else {
+      renderExperiences(dummyExperiences);
+    }
+  }
+
+  loadExperiences();
 
   // Modal Close Logic
-  const modal = document.getElementById('expModal');
-  const closeBtn = document.getElementById('modalClose');
+  var modal = document.getElementById('expModal');
+  var closeBtn = document.getElementById('modalClose');
   if (modal && closeBtn) {
     function closeModal() {
       modal.classList.remove('active');
@@ -320,19 +366,5 @@
       if (e.target === modal) closeModal();
     });
   }
-
-  // Re-run scroll reveal for newly created elements
-  var newReveals = container.querySelectorAll('.reveal');
-  function checkNew() {
-    for (var i = 0; i < newReveals.length; i++) {
-      var el = newReveals[i];
-      var top = el.getBoundingClientRect().top;
-      if (top < window.innerHeight * 0.85) {
-        el.classList.add('visible');
-      }
-    }
-  }
-  window.addEventListener('scroll', checkNew);
-  setTimeout(checkNew, 100);
 })();
 
