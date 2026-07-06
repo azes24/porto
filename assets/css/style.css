@@ -235,10 +235,9 @@ button, input, textarea { cursor: none; font-family: inherit; }
   50% { transform: translateY(-12px); }
 }
 
-@keyframes scrollIndicator {
-  0% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(12px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+@keyframes profileGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
 }
 
 @keyframes gradientShift {
@@ -324,11 +323,14 @@ button, input, textarea { cursor: none; font-family: inherit; }
 .hero {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   text-align: center;
   overflow: hidden;
+  padding-top: 5rem;
+  padding-bottom: 0;
 }
 
 .hero-orb {
@@ -389,31 +391,182 @@ button, input, textarea { cursor: none; font-family: inherit; }
   opacity: 0;
 }
 
-.scroll-indicator {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+/* =====================================
+   HERO SHOWCASE (Profile + Experience Grid)
+   ===================================== */
+.hero-showcase {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 2rem;
+  max-width: 960px;
+  width: 100%;
+  padding: 0 2rem;
+  margin-top: 1.5rem;
   animation: heroFadeUp 1s ease-out 0.6s forwards;
   opacity: 0;
 }
 
-.scroll-chevron {
+/* ── Profile Card (Natural Cutout) ── */
+.profile-card {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  animation: floatChevron 2s ease-in-out infinite;
-  transition: color 0.3s ease;
+  flex-shrink: 0;
+  width: 280px;
 }
 
-.scroll-chevron:hover {
-  color: var(--accent-blue);
+.profile-photo {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+  z-index: 1;
+  transition: transform 0.4s ease;
 }
 
-@keyframes floatChevron {
-  0%, 100% { transform: translateY(0); opacity: 0.7; }
-  50% { transform: translateY(10px); opacity: 1; }
+.profile-photo:hover {
+  transform: scale(1.03);
+}
+
+.profile-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.profile-img.active {
+  opacity: 1;
+}
+
+/* Gradient fade at the bottom — smooth cutoff */
+.profile-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(to top, #000000 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.profile-dots {
+  display: flex;
+  gap: 10px;
+  margin-top: 0.75rem;
+  z-index: 1;
+}
+
+.profile-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-dot:hover {
+  background: rgba(59, 130, 246, 0.4);
+  border-color: var(--accent-blue);
+  transform: scale(1.3);
+}
+
+.profile-dot.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+/* ── Experience Grid ── */
+.exp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  flex: 1;
+  align-self: center;
+}
+
+.exp-grid-item {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.4s ease,
+              border-color 0.4s ease,
+              z-index 0s;
+  z-index: 1;
+}
+
+.exp-grid-item:hover {
+  transform: scale(1.1);
+  z-index: 10;
+  border-color: var(--accent-purple);
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.25), 0 0 0 1px rgba(139, 92, 246, 0.3);
+}
+
+.exp-grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.exp-grid-item:hover img {
+  transform: scale(1.1);
+}
+
+.exp-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 0.85rem;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.exp-grid-item:hover .exp-grid-overlay {
+  opacity: 1;
+}
+
+.exp-grid-overlay span {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Wave Curve Divider ── */
+.hero-wave {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  line-height: 0;
+}
+
+.hero-wave svg {
+  width: 100%;
+  height: 100px;
+  display: block;
 }
 
 /* =====================================
@@ -828,6 +981,10 @@ button, input, textarea { cursor: none; font-family: inherit; }
   .cursor-dot, .cursor-ring { display: none !important; }
   .nav-links { gap: 1.5rem; }
   .nav-links a { font-size: 0.85rem; }
+  .hero-showcase { flex-direction: column; align-items: center; gap: 1.5rem; }
+  .profile-card { width: 220px; }
+  .profile-photo { height: 300px; }
+  .exp-grid { width: 100%; }
   .exp-card-inner { flex-direction: column; }
   .exp-image { width: 100%; min-height: 180px; }
   .exp-body { padding: 1.5rem; }
@@ -843,5 +1000,8 @@ button, input, textarea { cursor: none; font-family: inherit; }
 @media (max-width: 480px) {
   .nav-links { gap: 1rem; }
   .exp-header { flex-direction: column; }
+  .profile-card { width: 180px; }
+  .profile-photo { height: 250px; }
+  .exp-grid { grid-template-columns: 1fr; }
 }
 

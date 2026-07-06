@@ -368,3 +368,56 @@
   }
 })();
 
+
+// ─── PROFILE PHOTO INTERACTION ─────────────────
+(function initProfilePhoto() {
+  var frame = document.getElementById('profileFrame');
+  var dotsContainer = document.getElementById('profileDots');
+  if (!frame || !dotsContainer) return;
+
+  var images = frame.querySelectorAll('.profile-img');
+  var dots = dotsContainer.querySelectorAll('.profile-dot');
+  var currentIndex = 0;
+
+  function showPhoto(index) {
+    images.forEach(function (img) { img.classList.remove('active'); });
+    dots.forEach(function (dot) { dot.classList.remove('active'); });
+    images[index].classList.add('active');
+    dots[index].classList.add('active');
+  }
+
+  // Hover: preview next photo temporarily
+  frame.addEventListener('mouseenter', function () {
+    var nextIndex = (currentIndex + 1) % images.length;
+    showPhoto(nextIndex);
+  });
+
+  // Leave: revert to permanent photo
+  frame.addEventListener('mouseleave', function () {
+    showPhoto(currentIndex);
+  });
+
+  // Click: permanently advance to next photo
+  frame.addEventListener('click', function () {
+    currentIndex = (currentIndex + 1) % images.length;
+    showPhoto(currentIndex);
+
+    // Visual feedback
+    frame.style.transform = 'scale(1.08)';
+    frame.style.filter = 'brightness(1.2)';
+    setTimeout(function () {
+      frame.style.transform = '';
+      frame.style.filter = '';
+    }, 400);
+  });
+
+  // Click on dots: set photo permanently
+  dots.forEach(function (dot) {
+    dot.addEventListener('click', function (e) {
+      e.stopPropagation();
+      currentIndex = parseInt(this.getAttribute('data-index'));
+      showPhoto(currentIndex);
+    });
+  });
+})();
+

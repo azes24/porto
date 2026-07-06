@@ -37,17 +37,68 @@
     <div class="hero-orb hero-orb-2"></div>
     <div class="hero-content">
       <h1 class="gradient-text">Building Digital<br>Experiences That Wow</h1>
-      <p>Creative Developer & Designer crafting high-performance, interactive, and beautiful web applications.</p>
-      <div class="hero-cta">
-        <a href="#experience" class="btn">Explore More &darr;</a>
+      <p>Creative Developer &amp; Designer crafting high-performance, interactive, and beautiful web applications.</p>
+    </div>
+
+    <!-- Hero Showcase: Profile + Experience Grid -->
+    <div class="hero-showcase reveal">
+      <!-- Profile Photo (Left) — natural cutout, no frame -->
+      <div class="profile-card" id="profileCard">
+        <div class="profile-photo" id="profileFrame">
+          <img src="assets/img/profil (0).png" alt="Profile Photo" class="profile-img active" data-index="0">
+          <img src="assets/img/profil (1).png" alt="Profile Photo" class="profile-img" data-index="1">
+          <img src="assets/img/profil (2).png" alt="Profile Photo" class="profile-img" data-index="2">
+          <div class="profile-fade"></div>
+        </div>
+        <div class="profile-dots" id="profileDots">
+          <span class="profile-dot active" data-index="0"></span>
+          <span class="profile-dot" data-index="1"></span>
+          <span class="profile-dot" data-index="2"></span>
+        </div>
+      </div>
+
+      <!-- Experience Photo Grid (Right) -->
+      <div class="exp-grid" id="expGrid">
+        <div class="exp-grid-item" data-index="0">
+          <img src="assets/img/exp-1.png" alt="Experience 1" loading="lazy">
+          <div class="exp-grid-overlay">
+            <span>Project 01</span>
+          </div>
+        </div>
+        <div class="exp-grid-item" data-index="1">
+          <img src="assets/img/exp-2.png" alt="Experience 2" loading="lazy">
+          <div class="exp-grid-overlay">
+            <span>Project 02</span>
+          </div>
+        </div>
+        <div class="exp-grid-item" data-index="2">
+          <img src="assets/img/exp-3.png" alt="Experience 3" loading="lazy">
+          <div class="exp-grid-overlay">
+            <span>Project 03</span>
+          </div>
+        </div>
+        <div class="exp-grid-item" data-index="3">
+          <img src="assets/img/exp-1.png" alt="Experience 4" loading="lazy">
+          <div class="exp-grid-overlay">
+            <span>Project 04</span>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="scroll-indicator">
-      <a href="#experience" class="scroll-chevron" aria-label="Scroll down">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </a>
+
+    <!-- Wave Curve Divider -->
+    <div class="hero-wave">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.6" />
+            <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.6" />
+          </linearGradient>
+        </defs>
+        <path d="M0,85 C360,15 720,130 1440,55 L1440,120 L0,120 Z" fill="#000000"/>
+        <path d="M0,85 C360,15 720,130 1440,55" fill="none" stroke="url(#waveGrad)" stroke-width="3"/>
+      </svg>
     </div>
   </section>
 
@@ -87,8 +138,6 @@
         <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;">Send Message</button>
       </form>
     </div>
-
-
   </section>
 
   <!-- Modal Popup for Experience -->
