@@ -36,6 +36,10 @@
   color: var(--text-primary);
 }
 
+:root.light-mode .profile-fade {
+  background: linear-gradient(to top, var(--bg-primary) 0%, transparent 100%);
+}
+
 :root.light-mode .gradient-text {
   background: linear-gradient(135deg, #0f172a 0%, var(--accent-blue) 100%);
   -webkit-background-clip: text;
