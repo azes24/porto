@@ -14,7 +14,7 @@
 })();
 
 // ─── CUSTOM CURSOR ─────────────────────────────
-(function initCursor() {
+function initCursor() {
   const dot = document.getElementById('cursorDot');
   const ring = document.getElementById('cursorRing');
   if (!dot || !ring) return;
@@ -89,7 +89,10 @@
   dot.style.opacity = '0';
   ring.style.opacity = '0';
   animate();
-})();
+}
+
+initCursor();
+document.addEventListener('componentsLoaded', initCursor);
 
 
 // ─── FLOATING PARTICLES ────────────────────────
@@ -187,7 +190,7 @@
 
 
 // ─── SCROLL REVEAL ─────────────────────────────
-(function initScrollReveal() {
+function initScrollReveal() {
   var reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
 
   function checkReveal() {
@@ -202,24 +205,34 @@
     }
   }
 
+  if (window._checkReveal) window.removeEventListener('scroll', window._checkReveal);
+  window._checkReveal = checkReveal;
   window.addEventListener('scroll', checkReveal);
   checkReveal(); // Run once on load
-})();
+}
+
+initScrollReveal();
+document.addEventListener('componentsLoaded', initScrollReveal);
 
 
 // ─── NAVBAR SCROLL EFFECT ──────────────────────
-(function initNavbar() {
+function initNavbar() {
   var navbar = document.getElementById('navbar');
   if (!navbar) return;
 
-  window.addEventListener('scroll', function () {
+  if (window._navScroll) window.removeEventListener('scroll', window._navScroll);
+  window._navScroll = function () {
     if (window.scrollY > 50) {
       navbar.classList.add('scrolled');
     } else {
       navbar.classList.remove('scrolled');
     }
-  });
-})();
+  };
+  window.addEventListener('scroll', window._navScroll);
+}
+
+initNavbar();
+document.addEventListener('componentsLoaded', initNavbar);
 
 
 // ─── EXPERIENCE DATA LOADER (Supabase + Fallback) ────
