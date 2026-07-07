@@ -46,9 +46,9 @@
     window.addEventListener('deviceorientation', (event) => {
       let gamma = event.gamma; // Left-to-right tilt in degrees [-90, 90]
       if (gamma !== null) {
-        // Clamp to [-60, 60] to avoid extreme forces, then map to gravity magnitude
-        let clampedGamma = Math.max(-60, Math.min(60, gamma));
-        gravityX = (clampedGamma / 60) * gravityY * 1.5; // Multiply by 1.5 for slightly stronger horizontal effect
+        // Clamp to [-45, 45] and reduce multiplier to make it less harsh
+        let clampedGamma = Math.max(-45, Math.min(45, gamma));
+        gravityX = (clampedGamma / 45) * gravityY * 0.4; 
       }
     }, { passive: true });
   }
@@ -142,6 +142,12 @@
       
       handlePos.x += velocity.x;
       handlePos.y += velocity.y;
+
+      // Prevent string from swinging into the upper half (above the switch)
+      if (handlePos.y < switchY) {
+        handlePos.y = switchY;
+        if (velocity.y < 0) velocity.y = 0; // kill upward velocity if it hits the ceiling
+      }
     }
 
     // 3. String Constraint (Inelastic string)
