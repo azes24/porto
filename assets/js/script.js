@@ -273,10 +273,10 @@
       card.style.cursor = 'none';
       var coverImage = exp.images && exp.images.length > 0 ? exp.images[0] : '';
       
-      var dateHtml = exp.activity_date ? '<span class="exp-date">' + exp.activity_date + '</span>' : '';
+      var dateHtml = exp.activity_date ? '<div class="exp-date">' + exp.activity_date + '</div>' : '';
       var categoriesHtml = '';
       if (exp.categories && exp.categories.length > 0) {
-        categoriesHtml = '<div class="exp-categories">';
+        categoriesHtml = '<div class="exp-categories" style="margin-top: 0.5rem;">';
         exp.categories.forEach(function(cat) {
           categoriesHtml += '<span class="exp-category-badge">' + cat + '</span>';
         });
@@ -292,10 +292,10 @@
             '<div class="exp-header">' +
               '<div>' +
                 '<h3 class="exp-title">' + exp.title + '</h3>' +
-                dateHtml +
-                categoriesHtml +
                 '<h4 class="exp-company">' + exp.company + '</h4>' +
+                categoriesHtml +
               '</div>' +
+              dateHtml +
             '</div>' +
             '<div class="exp-location">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>' +
