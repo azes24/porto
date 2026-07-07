@@ -273,6 +273,16 @@
       card.style.cursor = 'none';
       var coverImage = exp.images && exp.images.length > 0 ? exp.images[0] : '';
       
+      var dateHtml = exp.activity_date ? '<span class="exp-date">' + exp.activity_date + '</span>' : '';
+      var categoriesHtml = '';
+      if (exp.categories && exp.categories.length > 0) {
+        categoriesHtml = '<div class="exp-categories">';
+        exp.categories.forEach(function(cat) {
+          categoriesHtml += '<span class="exp-category-badge">' + cat + '</span>';
+        });
+        categoriesHtml += '</div>';
+      }
+      
       card.innerHTML =
         '<div class="exp-card-inner">' +
           '<div class="exp-image">' +
@@ -282,6 +292,8 @@
             '<div class="exp-header">' +
               '<div>' +
                 '<h3 class="exp-title">' + exp.title + '</h3>' +
+                dateHtml +
+                categoriesHtml +
                 '<h4 class="exp-company">' + exp.company + '</h4>' +
               '</div>' +
             '</div>' +
@@ -308,6 +320,24 @@
           }
           
           document.getElementById('modalTitle').textContent = exp.title;
+          
+          var mDate = document.getElementById('modalDate');
+          if(mDate) {
+            mDate.textContent = exp.activity_date || '';
+            mDate.style.display = exp.activity_date ? 'inline-block' : 'none';
+          }
+          
+          var mCats = document.getElementById('modalCategories');
+          if(mCats) {
+            if (exp.categories && exp.categories.length > 0) {
+              mCats.innerHTML = exp.categories.map(function(c) { return '<span class="exp-category-badge">' + c + '</span>'; }).join('');
+              mCats.style.display = 'flex';
+            } else {
+              mCats.innerHTML = '';
+              mCats.style.display = 'none';
+            }
+          }
+          
           document.getElementById('modalCompany').textContent = exp.company;
           document.getElementById('modalLocation').textContent = exp.location;
           document.getElementById('modalDesc').textContent = exp.description;

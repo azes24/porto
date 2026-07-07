@@ -68,6 +68,12 @@
     .modal-overlay-edit.active .modal-content-edit { transform:scale(1); }
     .modal-close-edit { position:absolute; top:15px; right:20px; background:transparent; border:none; color:var(--text-primary); font-size:1.5rem; cursor:pointer; }
     .empty-state svg { opacity:0.3; margin-bottom:1rem; }
+    .checkbox-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem; }
+    .checkbox-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer; background: rgba(255,255,255,0.05); padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--border); transition: all 0.2s; }
+    .checkbox-label:hover { background: rgba(255,255,255,0.1); border-color: var(--accent-blue); }
+    .checkbox-label input { accent-color: var(--accent-blue); }
+    .cat-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+    .cat-item:last-child { border-bottom: none; }
     @media(max-width:768px) { .form-grid { grid-template-columns:1fr; } }
   </style>
 </head>
@@ -113,13 +119,25 @@
             <input type="text" id="f-title" class="input" placeholder="e.g. Frontend Developer" required>
           </div>
           <div>
+            <label class="form-label">Activity Date</label>
+            <input type="date" id="f-date" class="input" required>
+          </div>
+          <div>
             <label class="form-label">Company / Organization</label>
             <input type="text" id="f-company" class="input" placeholder="e.g. Tech Corp" required>
           </div>
-          <div class="full-width">
+          <div>
             <label class="form-label">Location</label>
             <input type="text" id="f-location" class="input" placeholder="e.g. Jakarta, Indonesia" required>
           </div>
+          <div class="full-width">
+            <label class="form-label">Categories</label>
+            <div class="checkbox-grid" id="addCategoryCheckboxes">
+              <!-- Checkboxes dynamically loaded -->
+              <span style="color:var(--text-secondary);font-size:0.8rem;">Loading categories...</span>
+            </div>
+          </div>
+
           <div class="full-width">
             <label class="form-label">Description</label>
             <textarea id="f-desc" class="input" rows="3" placeholder="Describe the experience..." required></textarea>
@@ -152,6 +170,21 @@
           </div>
         </div>
       </div>
+
+      <!-- Manage Categories -->
+      <div class="glass" style="padding:2rem; margin-top:2rem;">
+        <h3 style="margin-bottom:1rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          Manage Categories
+        </h3>
+        <form id="addCategoryForm" style="display:flex; gap:1rem; margin-bottom: 1.5rem;">
+          <input type="text" id="newCatName" class="input" placeholder="New Category Name (e.g. Web Development)" required style="flex:1;">
+          <button type="submit" class="btn btn-primary" id="catSubmitBtn">Add Category</button>
+        </form>
+        <div id="categoryList">
+          <div class="empty-state" style="padding: 1rem;"><p>Loading categories...</p></div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -167,13 +200,24 @@
           <input type="text" id="e-title" class="input" required>
         </div>
         <div>
+          <label class="form-label">Activity Date</label>
+          <input type="date" id="e-date" class="input" required>
+        </div>
+        <div>
           <label class="form-label">Company / Organization</label>
           <input type="text" id="e-company" class="input" required>
         </div>
-        <div class="full-width">
+        <div>
           <label class="form-label">Location</label>
           <input type="text" id="e-location" class="input" required>
         </div>
+        <div class="full-width">
+          <label class="form-label">Categories</label>
+          <div class="checkbox-grid" id="editCategoryCheckboxes">
+            <!-- Loaded dynamically -->
+          </div>
+        </div>
+
         <div class="full-width">
           <label class="form-label">Description</label>
           <textarea id="e-desc" class="input" rows="3" required></textarea>
@@ -243,6 +287,99 @@
         };
         reader.readAsDataURL(file);
       });
+    }
+
+    // ─── Categories Logic ───
+    let currentCategories = [];
+    
+    async function loadCategories() {
+      if (!configured) return;
+      try {
+        const sb = getSupabase();
+        const { data, error } = await sb.from('categories').select('*').order('created_at', { ascending: true });
+        if (error) throw error;
+        currentCategories = data || [];
+        
+        renderCategoryList();
+        renderCategoryCheckboxes();
+      } catch (err) {
+        console.error("Error loading categories:", err);
+      }
+    }
+
+    function renderCategoryList() {
+      const list = document.getElementById('categoryList');
+      if (currentCategories.length === 0) {
+        list.innerHTML = '<div class="empty-state" style="padding:1rem;"><p>Belum ada kategori.</p></div>';
+        return;
+      }
+      list.innerHTML = '';
+      currentCategories.forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'cat-item';
+        div.innerHTML = `
+          <span>${cat.name}</span>
+          <button class="btn btn-danger" style="padding: 0.25rem 0.5rem;" onclick="deleteCategory('${cat.id}')">Delete</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function renderCategoryCheckboxes() {
+      const addContainer = document.getElementById('addCategoryCheckboxes');
+      const editContainer = document.getElementById('editCategoryCheckboxes');
+      
+      let html = '';
+      if (currentCategories.length === 0) {
+        html = '<span style="color:var(--text-secondary);font-size:0.8rem;">Belum ada kategori. Tambahkan di bawah.</span>';
+      } else {
+        currentCategories.forEach(cat => {
+          html += `
+            <label class="checkbox-label">
+              <input type="checkbox" name="cat_checkbox" value="${cat.name}">
+              ${cat.name}
+            </label>
+          `;
+        });
+      }
+      
+      addContainer.innerHTML = html;
+      editContainer.innerHTML = html; // edit container will be populated when modal opens
+    }
+
+    document.getElementById('addCategoryForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!configured) return;
+      const btn = document.getElementById('catSubmitBtn');
+      const input = document.getElementById('newCatName');
+      const name = input.value.trim();
+      
+      btn.disabled = true;
+      try {
+        const sb = getSupabase();
+        const { error } = await sb.from('categories').insert({ name: name });
+        if (error) throw error;
+        showToast('Kategori ditambahkan!', 'success');
+        input.value = '';
+        loadCategories();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    async function deleteCategory(id) {
+      if (!confirm('Yakin hapus kategori ini?')) return;
+      try {
+        const sb = getSupabase();
+        const { error } = await sb.from('categories').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Kategori dihapus!', 'success');
+        loadCategories();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
     }
 
     // ─── Check DB Status ───
@@ -321,12 +458,17 @@
           imageUrls.push(urlData.publicUrl);
         }
 
+        // Get checked categories
+        const checkedCats = Array.from(document.querySelectorAll('#addCategoryCheckboxes input:checked')).map(cb => cb.value);
+
         // Insert record
         const { error: insertErr } = await sb.from('experiences').insert({
           title: document.getElementById('f-title').value,
+          activity_date: document.getElementById('f-date').value,
           company: document.getElementById('f-company').value,
           location: document.getElementById('f-location').value,
           description: document.getElementById('f-desc').value,
+          categories: checkedCats,
           images: imageUrls
         });
 
@@ -356,9 +498,18 @@
 
       document.getElementById('e-id').value = exp.id;
       document.getElementById('e-title').value = exp.title;
+      document.getElementById('e-date').value = exp.activity_date || '';
       document.getElementById('e-company').value = exp.company;
       document.getElementById('e-location').value = exp.location;
       document.getElementById('e-desc').value = exp.description;
+      
+      // Check categories
+      const editContainer = document.getElementById('editCategoryCheckboxes');
+      const checkboxes = editContainer.querySelectorAll('input[type="checkbox"]');
+      const expCats = exp.categories || [];
+      checkboxes.forEach(cb => {
+        cb.checked = expCats.includes(cb.value);
+      });
       
       editExistingImages = exp.images ? [...exp.images] : [];
       editSelectedFiles = [];
@@ -439,13 +590,18 @@
           finalImageUrls.push(urlData.publicUrl);
         }
 
+        // Get checked categories
+        const checkedCats = Array.from(document.querySelectorAll('#editCategoryCheckboxes input:checked')).map(cb => cb.value);
+
         // Update record
         const id = document.getElementById('e-id').value;
         const { error: updateErr } = await sb.from('experiences').update({
           title: document.getElementById('e-title').value,
+          activity_date: document.getElementById('e-date').value,
           company: document.getElementById('e-company').value,
           location: document.getElementById('e-location').value,
           description: document.getElementById('e-desc').value,
+          categories: checkedCats,
           images: finalImageUrls
         }).eq('id', id);
 
