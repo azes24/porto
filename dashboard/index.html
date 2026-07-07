@@ -86,9 +86,13 @@
     <aside class="sidebar">
       <h2 class="gradient-text">Admin Panel</h2>
       <nav>
-        <a href="#" class="active">
+        <a href="#" class="active" id="nav-exp" onclick="switchTab('exp', event)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
           Experiences
+        </a>
+        <a href="#" id="nav-cat" onclick="switchTab('cat', event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          Categories
         </a>
         <a href="/" style="margin-top:auto;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -102,10 +106,13 @@
     </aside>
 
     <main class="main-content">
-      <div class="dash-header">
-        <h1>Manage Experiences</h1>
-        <span class="status-badge" id="dbStatus">Checking...</span>
-      </div>
+      
+      <!-- Experiences Tab -->
+      <div id="tab-exp">
+        <div class="dash-header">
+          <h1>Manage Experiences</h1>
+          <span class="status-badge" id="dbStatus">Checking...</span>
+        </div>
 
       <!-- Add Form -->
       <div class="glass" style="padding:2rem; margin-bottom:2rem;">
@@ -170,13 +177,16 @@
           </div>
         </div>
       </div>
+      </div>
 
-      <!-- Manage Categories -->
-      <div class="glass" style="padding:2rem; margin-top:2rem;">
+      <!-- Categories Tab -->
+      <div id="tab-cat" style="display:none;">
+        <div class="dash-header">
+          <h1>Manage Categories</h1>
+        </div>
+
+      <div class="glass" style="padding:2rem;">
         <h3 style="margin-bottom:1rem;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-          Manage Categories
-        </h3>
         <form id="addCategoryForm" style="display:flex; gap:1rem; margin-bottom: 1.5rem;">
           <input type="text" id="newCatName" class="input" placeholder="New Category Name (e.g. Web Development)" required style="flex:1;">
           <button type="submit" class="btn btn-primary" id="catSubmitBtn">Add Category</button>
@@ -184,6 +194,7 @@
         <div id="categoryList">
           <div class="empty-state" style="padding: 1rem;"><p>Loading categories...</p></div>
         </div>
+      </div>
       </div>
     </main>
   </div>
@@ -250,6 +261,16 @@
       t.textContent = msg;
       t.className = 'toast toast-' + (type || 'success') + ' show';
       setTimeout(() => { t.classList.remove('show'); }, 3000);
+    }
+
+    // ─── Tabs Logic ───
+    function switchTab(tabId, e) {
+      if (e) e.preventDefault();
+      document.getElementById('tab-exp').style.display = tabId === 'exp' ? 'block' : 'none';
+      document.getElementById('tab-cat').style.display = tabId === 'cat' ? 'block' : 'none';
+      
+      document.getElementById('nav-exp').classList.toggle('active', tabId === 'exp');
+      document.getElementById('nav-cat').classList.toggle('active', tabId === 'cat');
     }
 
     // ─── Logout ───
