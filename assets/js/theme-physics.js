@@ -21,7 +21,7 @@
   const maxPullY = 20;              // Maximum downward pull of the switch
   const stringLength = 100;         // Fixed length of the inelastic string
   const gravity = 1.2;              // Gravity force
-  const friction = 0.92;            // Air friction / damping
+  const friction = 0.97;            // Air friction / damping (higher = swings longer)
   const switchSpring = 0.2;         // Spring constant for the switch
   const scrollForceMult = 0.15;     // How much scroll affects the handle
 
@@ -154,9 +154,14 @@
         handlePos.x -= nx * handleCorrection;
         handlePos.y -= ny * handleCorrection;
         
-        // Remove velocity component outward
+        // Remove velocity component outward (inelastic string)
         const dot = velocity.x * nx + velocity.y * ny;
         if (dot > 0) {
+          // If the string snaps taut and loses a lot of vertical velocity, 
+          // transfer a tiny bit to horizontal so it swings (pendulum effect)
+          if (ny > 0.9 && Math.abs(velocity.x) < 1) {
+             velocity.x += (Math.random() > 0.5 ? 1 : -1) * (dot * 0.15);
+          }
           velocity.x -= dot * nx;
           velocity.y -= dot * ny;
         }
@@ -193,13 +198,20 @@
       
       // Calculate a bowing amount based on slack
       const bowAmount = Math.sqrt(slack * stringLength) * 0.8;
-      // Decide direction of bow. If mostly centered, bow left. If handle is right, bow left.
-      const bowDir = (handlePos.x > anchorX) ? -1 : 1; 
+      
+      // Bow direction based on horizontal velocity or position
+      let bowDir = 1;
+      if (Math.abs(velocity.x) > 0.5) {
+        bowDir = (velocity.x > 0) ? -1 : 1; // Bow opposite to movement
+      } else {
+        bowDir = (handlePos.x > anchorX) ? -1 : 1;
+      }
+      
       // Add extra bowing if scrolling up fast
-      const scrollBow = Math.max(0, -scrollVelocity * 0.5);
+      const scrollBow = Math.max(0, -scrollVelocity * 0.4);
       
       const cpX = midX + (bowAmount + scrollBow) * bowDir;
-      const cpY = midY + (bowAmount * 0.2); // slight downward droop for the curve
+      const cpY = midY + (bowAmount * 0.3); // downward droop for the curve
 
       path.setAttribute('d', `M ${anchorX} ${switchY} Q ${cpX} ${cpY} ${handlePos.x} ${handlePos.y}`);
     } else {
