@@ -159,8 +159,8 @@
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = 'rgba(255, 255, 255, ' + (0.05 * (1 - dist / 120)) + ')';
-          ctx.lineWidth = 0.5;
+          ctx.strokeStyle = 'rgba(255, 255, 255, ' + (0.15 * (1 - dist / 120)) + ')';
+          ctx.lineWidth = 0.8;
           ctx.stroke();
         }
       }
@@ -173,8 +173,8 @@
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
         ctx.lineTo(mouseParticle.x, mouseParticle.y);
-        ctx.strokeStyle = 'rgba(59, 130, 246, ' + (0.2 * (1 - distm / 150)) + ')'; // Subtle blue on hover
-        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = 'rgba(59, 130, 246, ' + (0.8 * (1 - distm / 150)) + ')'; // Clearer blue connection to mouse
+        ctx.lineWidth = 1.2;
         ctx.stroke();
       }
     }

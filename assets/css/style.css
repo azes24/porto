@@ -416,6 +416,14 @@ button, input, textarea { cursor: none; font-family: inherit; }
   padding: 2rem;
 }
 
+.hero-content .hero-name {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  animation: heroFadeUp 1s ease-out forwards;
+  opacity: 0;
+}
+
 .hero-content h1 {
   font-size: clamp(2.5rem, 6vw, 4.5rem);
   font-weight: 800;
