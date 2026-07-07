@@ -13,6 +13,39 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* Light Mode Overrides */
+:root.light-mode {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --accent-glow: rgba(59, 130, 246, 0.2);
+  --border: rgba(0, 0, 0, 0.08);
+}
+
+:root.light-mode .gradient-text {
+  background: linear-gradient(135deg, #0f172a 0%, var(--accent-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+:root.light-mode .glass {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+:root.light-mode .input {
+  background: #ffffff;
+  color: var(--text-primary);
+}
+
+:root.light-mode .cursor-dot {
+  background: #0f172a;
+}
+:root.light-mode .cursor-ring {
+  border-color: rgba(15, 23, 42, 0.5);
+}
+
 * {
   margin: 0;
   padding: 0;
