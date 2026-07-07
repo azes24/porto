@@ -87,6 +87,8 @@ function initThemePhysics() {
 
     handle.setAttribute('stroke', 'var(--accent-purple)');
     handle.setAttribute('r', '14');
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.setAttribute('stroke', 'var(--accent-purple)');
   }
 
   function doDrag(clientX, clientY) {
@@ -100,7 +102,9 @@ function initThemePhysics() {
     if (!isDragging) return;
     isDragging = false;
     handle.setAttribute('stroke', 'var(--accent-blue)');
-    handle.setAttribute('r', '12');
+    handle.setAttribute('r', '15'); // reset to 15 to fit icon
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.setAttribute('stroke', 'var(--accent-blue)');
 
     // Trigger theme toggle if it was pulled all the way down
     if (isPrimed && !hasTriggered) {
