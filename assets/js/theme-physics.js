@@ -2,12 +2,16 @@
    theme-physics.js — Realistic pull string physics for theme toggle
    ================================================ */
 
-(function initThemePhysics() {
+let isPhysicsInitialized = false;
+
+function initThemePhysics() {
+  if (isPhysicsInitialized) return;
   const container = document.getElementById('theme-toggle-wrapper');
   const svg = document.getElementById('theme-string-svg');
   const path = document.getElementById('string-path');
   const handle = document.getElementById('string-handle');
   if (!container || !svg || !path || !handle) return;
+  isPhysicsInitialized = true;
 
   // Initialize theme from localStorage
   const currentTheme = localStorage.getItem('theme') || 'dark';
@@ -222,6 +226,11 @@
     // Render
     handle.setAttribute('cx', handlePos.x);
     handle.setAttribute('cy', handlePos.y);
+    const icon = document.getElementById('theme-icon');
+    if (icon) {
+      icon.setAttribute('x', handlePos.x - 8);
+      icon.setAttribute('y', handlePos.y - 8);
+    }
 
     // Render String (Bend if slack)
     const slack = stringLength - distance;
@@ -259,4 +268,7 @@
 
   // Start physics loop
   update();
-})();
+}
+
+initThemePhysics();
+document.addEventListener('componentsLoaded', initThemePhysics);

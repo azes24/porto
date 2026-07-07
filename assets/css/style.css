@@ -1155,7 +1155,15 @@ button, input, textarea { cursor: none; font-family: inherit; }
   .sidebar nav { flex-direction: row; flex: 0; gap: 0.5rem; }
   .sidebar a { padding: 0.5rem 0.75rem; font-size: 0.8rem; }
   .main-content { padding: 1.5rem; }
+
 }
+
+/* Theme Toggle String Icons */
+.moon-icon { display: block; }
+.sun-icon { display: none; }
+
+:root.light-mode .moon-icon { display: none; }
+:root.light-mode .sun-icon { display: block; }
 
 @media (max-width: 480px) {
   .nav-links { gap: 1rem; }

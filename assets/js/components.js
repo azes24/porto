@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadComponent("navbar-placeholder", "components/navbar.html"),
     loadComponent("footer-placeholder", "components/footer.html"),
     loadComponent("cursor-placeholder", "components/cursor.html"),
+    loadComponent("theme-toggle-placeholder", "components/theme-toggle.html"),
     loadComponent("modal-placeholder", "components/modal.html")
   ]);
 
