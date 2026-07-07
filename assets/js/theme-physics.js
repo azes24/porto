@@ -16,21 +16,25 @@
   }
 
   // Physics constants
-  const anchor = { x: 30, y: -20 }; // Fixed top point, slightly hidden
-  const restY = 80;                 // Resting length of the string
-  const k = 0.05;                   // Spring constant
-  const damping = 0.85;             // Friction/damping (lower = stops faster)
-  const gravity = 0.8;              // Downward force
-  const scrollForceMult = 0.08;     // How much scroll affects the handle
+  const anchorX = 30;               // Fixed horizontal anchor
+  const switchRestY = -20;          // Resting position of the switch (top of string)
+  const maxPullY = 20;              // Maximum downward pull of the switch
+  const stringLength = 100;         // Fixed length of the inelastic string
+  const gravity = 1.2;              // Gravity force
+  const friction = 0.92;            // Air friction / damping
+  const switchSpring = 0.2;         // Spring constant for the switch
+  const scrollForceMult = 0.15;     // How much scroll affects the handle
 
   // State
-  let handlePos = { x: anchor.x, y: restY };
-  let velocity = { x: 0, y: 0 };
-  let isDragging = false;
-  let hasTriggered = false; // Prevents multiple toggles on one pull
+  let switchY = switchRestY;
+  let switchVy = 0;
   
-  // Dragging state
+  let handlePos = { x: anchorX, y: switchRestY + stringLength };
+  let velocity = { x: 0, y: 0 };
+  
+  let isDragging = false;
   let dragOffset = { x: 0, y: 0 };
+  let hasTriggered = false;
 
   // Scroll momentum tracking
   let lastScrollY = window.scrollY;
@@ -52,19 +56,16 @@
     isDragging = true;
     hasTriggered = false;
     
-    // Convert client coords to SVG local coords
     const rect = svg.getBoundingClientRect();
     const svgX = clientX - rect.left;
     const svgY = clientY - rect.top;
     
-    // Calculate offset from handle center to drag point
     dragOffset.x = svgX - handlePos.x;
     dragOffset.y = svgY - handlePos.y;
     
     velocity.x = 0;
     velocity.y = 0;
     
-    // Add grabbed class for visual feedback
     handle.setAttribute('stroke', 'var(--accent-purple)');
     handle.setAttribute('r', '14');
   }
@@ -74,11 +75,6 @@
     const rect = svg.getBoundingClientRect();
     handlePos.x = (clientX - rect.left) - dragOffset.x;
     handlePos.y = (clientY - rect.top) - dragOffset.y;
-    
-    // Limit how far it can be pulled down
-    if (handlePos.y > 180) {
-      handlePos.y = 180;
-    }
   }
 
   function endDrag() {
@@ -86,14 +82,6 @@
     isDragging = false;
     handle.setAttribute('stroke', 'var(--accent-blue)');
     handle.setAttribute('r', '12');
-    
-    // Toggle theme if pulled down far enough
-    if (handlePos.y > 150 && !hasTriggered) {
-      hasTriggered = true;
-      toggleTheme();
-      // Give it an extra upward kick after toggling
-      velocity.y = -20;
-    }
   }
 
   function toggleTheme() {
@@ -106,7 +94,6 @@
     }
   }
 
-  // Event Listeners
   handle.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
   handle.addEventListener('touchstart', (e) => {
     const touch = e.touches[0];
@@ -116,7 +103,7 @@
   window.addEventListener('mousemove', (e) => doDrag(e.clientX, e.clientY));
   window.addEventListener('touchmove', (e) => {
     if (isDragging) {
-      e.preventDefault(); // Prevent scrolling while pulling the string
+      e.preventDefault();
       const touch = e.touches[0];
       doDrag(touch.clientX, touch.clientY);
     }
@@ -127,32 +114,98 @@
 
   // Physics Loop
   function update() {
+    // 1. Switch Spring Physics
+    const switchForce = -switchSpring * (switchY - switchRestY);
+    switchVy += switchForce;
+    switchVy *= 0.8; // High damping for switch
+    switchY += switchVy;
+
+    // 2. Handle Physics
     if (!isDragging) {
-      // Spring forces
-      const forceX = -k * (handlePos.x - anchor.x);
-      const forceY = -k * (handlePos.y - restY) + gravity;
-
-      velocity.x += forceX;
-      velocity.y += forceY;
-
-      velocity.x *= damping;
-      velocity.y *= damping;
-
+      velocity.y += gravity;
+      velocity.x *= friction;
+      velocity.y *= friction;
+      
       handlePos.x += velocity.x;
       handlePos.y += velocity.y;
+    }
+
+    // 3. String Constraint (Inelastic string)
+    const dx = handlePos.x - anchorX;
+    const dy = handlePos.y - switchY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > stringLength) {
+      // String is taut!
+      const nx = dx / distance;
+      const ny = dy / distance;
+      const diff = distance - stringLength;
+
+      if (isDragging) {
+        // Dragging forces the switch down
+        switchY += diff;
+      } else {
+        // Pull handle back, and pull switch down based on relative masses
+        // Let's say switch is much heavier/stiffer
+        const switchCorrection = diff * 0.1;
+        const handleCorrection = diff * 0.9;
+        
+        switchY += switchCorrection;
+        handlePos.x -= nx * handleCorrection;
+        handlePos.y -= ny * handleCorrection;
+        
+        // Remove velocity component outward
+        const dot = velocity.x * nx + velocity.y * ny;
+        if (dot > 0) {
+          velocity.x -= dot * nx;
+          velocity.y -= dot * ny;
+        }
+      }
+    }
+
+    // 4. Clamp Switch
+    if (switchY > maxPullY) {
+      switchY = maxPullY;
+      // If pulled to max and hasn't triggered yet, toggle!
+      if (!hasTriggered && distance >= stringLength - 1) {
+        hasTriggered = true;
+        toggleTheme();
+        
+        // Give a little haptic feedback kick (simulate switch snapping)
+        switchVy = -15; 
+        if(!isDragging) {
+          velocity.y = -5; 
+        }
+      }
     }
 
     // Render
     handle.setAttribute('cx', handlePos.x);
     handle.setAttribute('cy', handlePos.y);
 
-    // Draw curved string (quadratic bezier)
-    // Control point is halfway down, but pushed out based on horizontal displacement
-    const cpX = (anchor.x + handlePos.x) / 2;
-    // The curve bows outwards based on velocity for a waving effect
-    const waveOffset = velocity.x * 2;
-    
-    path.setAttribute('d', `M ${anchor.x} ${anchor.y} Q ${cpX + waveOffset} ${(anchor.y + handlePos.y)/2} ${handlePos.x} ${handlePos.y}`);
+    // Render String (Bend if slack)
+    const slack = stringLength - distance;
+    if (slack > 0) {
+      // String is slack, render as curved Bezier
+      // The curve bows outwards. Bow direction depends on horizontal position/velocity
+      const midX = (anchorX + handlePos.x) / 2;
+      const midY = (switchY + handlePos.y) / 2;
+      
+      // Calculate a bowing amount based on slack
+      const bowAmount = Math.sqrt(slack * stringLength) * 0.8;
+      // Decide direction of bow. If mostly centered, bow left. If handle is right, bow left.
+      const bowDir = (handlePos.x > anchorX) ? -1 : 1; 
+      // Add extra bowing if scrolling up fast
+      const scrollBow = Math.max(0, -scrollVelocity * 0.5);
+      
+      const cpX = midX + (bowAmount + scrollBow) * bowDir;
+      const cpY = midY + (bowAmount * 0.2); // slight downward droop for the curve
+
+      path.setAttribute('d', `M ${anchorX} ${switchY} Q ${cpX} ${cpY} ${handlePos.x} ${handlePos.y}`);
+    } else {
+      // String is taut, straight line
+      path.setAttribute('d', `M ${anchorX} ${switchY} Q ${(anchorX+handlePos.x)/2} ${(switchY+handlePos.y)/2} ${handlePos.x} ${handlePos.y}`);
+    }
 
     requestAnimationFrame(update);
   }
