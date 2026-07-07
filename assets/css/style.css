@@ -24,6 +24,15 @@
   --border: rgba(0, 0, 0, 0.08);
 }
 
+:root.light-mode .navbar {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+:root.light-mode .btn {
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+}
+
 :root.light-mode .gradient-text {
   background: linear-gradient(135deg, #0f172a 0%, var(--accent-blue) 100%);
   -webkit-background-clip: text;
