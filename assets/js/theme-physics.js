@@ -19,7 +19,7 @@
   const anchorX = 30;               // Fixed horizontal anchor
   const switchRestY = -20;          // Resting position of the switch (top of string)
   const maxPullY = 20;              // Maximum downward pull of the switch
-  const stringLength = 150;         // Fixed length of the inelastic string
+  const stringLength = 130;         // Fixed length of the inelastic string
   let gravityX = 0;                 // Horizontal gravity (from device orientation)
   let gravityY = 0.6;               // Vertical gravity (reduced for slower swing)
   const friction = 0.98;            // Air friction / damping (higher = swings longer)
@@ -29,10 +29,10 @@
   // State
   let switchY = switchRestY;
   let switchVy = 0;
-  
+
   let handlePos = { x: anchorX, y: switchRestY + stringLength };
   let velocity = { x: 0, y: 0 };
-  
+
   let isDragging = false;
   let dragOffset = { x: 0, y: 0 };
   let hasTriggered = false;
@@ -48,7 +48,7 @@
       if (gamma !== null) {
         // Clamp to [-45, 45] and reduce multiplier to make it less harsh
         let clampedGamma = Math.max(-45, Math.min(45, gamma));
-        gravityX = (clampedGamma / 45) * gravityY * 0.4; 
+        gravityX = (clampedGamma / 45) * gravityY * 0.4;
       }
     }, { passive: true });
   }
@@ -57,7 +57,7 @@
     let currentScroll = window.scrollY;
     scrollVelocity = currentScroll - lastScrollY;
     lastScrollY = currentScroll;
-    
+
     // Apply scroll velocity to handle (pulling up when scrolling down)
     if (!isDragging) {
       velocity.y -= scrollVelocity * scrollForceMult;
@@ -68,17 +68,17 @@
   function startDrag(clientX, clientY) {
     isDragging = true;
     hasTriggered = false;
-    
+
     const rect = svg.getBoundingClientRect();
     const svgX = clientX - rect.left;
     const svgY = clientY - rect.top;
-    
+
     dragOffset.x = svgX - handlePos.x;
     dragOffset.y = svgY - handlePos.y;
-    
+
     velocity.x = 0;
     velocity.y = 0;
-    
+
     handle.setAttribute('stroke', 'var(--accent-purple)');
     handle.setAttribute('r', '14');
   }
@@ -139,7 +139,7 @@
       velocity.y += gravityY;
       velocity.x *= friction;
       velocity.y *= friction;
-      
+
       handlePos.x += velocity.x;
       handlePos.y += velocity.y;
 
@@ -169,18 +169,18 @@
         // Let's say switch is much heavier/stiffer
         const switchCorrection = diff * 0.1;
         const handleCorrection = diff * 0.9;
-        
+
         switchY += switchCorrection;
         handlePos.x -= nx * handleCorrection;
         handlePos.y -= ny * handleCorrection;
-        
+
         // Remove velocity component outward (inelastic string)
         const dot = velocity.x * nx + velocity.y * ny;
         if (dot > 0) {
           // If the string snaps taut and loses a lot of vertical velocity, 
           // transfer a tiny bit to horizontal so it swings (pendulum effect)
           if (ny > 0.9 && Math.abs(velocity.x) < 1) {
-             velocity.x += (Math.random() > 0.5 ? 1 : -1) * (dot * 0.15);
+            velocity.x += (Math.random() > 0.5 ? 1 : -1) * (dot * 0.15);
           }
           velocity.x -= dot * nx;
           velocity.y -= dot * ny;
@@ -195,11 +195,11 @@
       if (!hasTriggered && distance >= stringLength - 1) {
         hasTriggered = true;
         toggleTheme();
-        
+
         // Give a little haptic feedback kick (simulate switch snapping)
-        switchVy = -15; 
-        if(!isDragging) {
-          velocity.y = -5; 
+        switchVy = -15;
+        if (!isDragging) {
+          velocity.y = -5;
         }
       }
     }
@@ -215,10 +215,10 @@
       // The curve bows outwards. Bow direction depends on horizontal position/velocity
       const midX = (anchorX + handlePos.x) / 2;
       const midY = (switchY + handlePos.y) / 2;
-      
+
       // Calculate a bowing amount based on slack
       const bowAmount = Math.sqrt(slack * stringLength) * 0.8;
-      
+
       // Bow direction based on horizontal velocity or position
       let bowDir = 1;
       if (Math.abs(velocity.x) > 0.5) {
@@ -226,17 +226,17 @@
       } else {
         bowDir = (handlePos.x > anchorX) ? -1 : 1;
       }
-      
+
       // Add extra bowing if scrolling up fast
       const scrollBow = Math.max(0, -scrollVelocity * 0.4);
-      
+
       const cpX = midX + (bowAmount + scrollBow) * bowDir;
       const cpY = midY + (bowAmount * 0.3); // downward droop for the curve
 
       path.setAttribute('d', `M ${anchorX} ${switchY} Q ${cpX} ${cpY} ${handlePos.x} ${handlePos.y}`);
     } else {
       // String is taut, straight line
-      path.setAttribute('d', `M ${anchorX} ${switchY} Q ${(anchorX+handlePos.x)/2} ${(switchY+handlePos.y)/2} ${handlePos.x} ${handlePos.y}`);
+      path.setAttribute('d', `M ${anchorX} ${switchY} Q ${(anchorX + handlePos.x) / 2} ${(switchY + handlePos.y) / 2} ${handlePos.x} ${handlePos.y}`);
     }
 
     requestAnimationFrame(update);
