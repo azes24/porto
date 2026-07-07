@@ -51,6 +51,50 @@
         <h2 class="gradient-text">My Experience</h2>
         <p>A timeline of my professional journey and the skills I've built along the way.</p>
       </div>
+      
+      <!-- Filter Bar -->
+      <div class="filter-bar glass reveal">
+        <div class="filter-group">
+          <label for="filterSort">Sort by</label>
+          <select id="filterSort" class="filter-select">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filterCat">Category</label>
+          <select id="filterCat" class="filter-select">
+            <option value="all">All Categories</option>
+            <!-- Categories loaded dynamically -->
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filterYear">Year</label>
+          <select id="filterYear" class="filter-select">
+            <option value="all">All Years</option>
+            <!-- Years loaded dynamically -->
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filterMonth">Month</label>
+          <select id="filterMonth" class="filter-select">
+            <option value="all">All Months</option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+      </div>
+
       <div class="experience-list" id="experience-container">
         <!-- Loaded by JavaScript -->
       </div>

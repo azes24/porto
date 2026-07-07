@@ -379,7 +379,11 @@
           
           btn.onclick = (function(pageNum) {
             return function() {
-              renderExperiences(experiences, pageNum);
+              if (document.getElementById('filterSort')) {
+                applyFilters(pageNum);
+              } else {
+                renderExperiences(experiences, pageNum);
+              }
               // scroll up a bit to show from the top of the list
               const section = document.getElementById('experience');
               if (section) {
@@ -442,6 +446,92 @@
     grid.innerHTML = html;
   }
 
+  // Filtering State
+  var allExperiencesData = [];
+
+  function initFilters() {
+    var sortSelect = document.getElementById('filterSort');
+    var catSelect = document.getElementById('filterCat');
+    var yearSelect = document.getElementById('filterYear');
+    var monthSelect = document.getElementById('filterMonth');
+    
+    if (!sortSelect || !catSelect || !yearSelect || !monthSelect) return;
+    
+    // Extract unique categories and years
+    var uniqueCats = new Set();
+    var uniqueYears = new Set();
+    
+    allExperiencesData.forEach(function(exp) {
+      if (exp.categories && exp.categories.length > 0) {
+        exp.categories.forEach(function(c) { uniqueCats.add(c); });
+      }
+      if (exp.activity_date) {
+        var year = exp.activity_date.split('-')[0];
+        if (year) uniqueYears.add(year);
+      }
+    });
+    
+    // Populate Categories
+    var catHtml = '<option value="all">All Categories</option>';
+    Array.from(uniqueCats).sort().forEach(function(c) {
+      catHtml += '<option value="' + c + '">' + c + '</option>';
+    });
+    catSelect.innerHTML = catHtml;
+    
+    // Populate Years
+    var yearHtml = '<option value="all">All Years</option>';
+    Array.from(uniqueYears).sort(function(a,b){return b-a}).forEach(function(y) {
+      yearHtml += '<option value="' + y + '">' + y + '</option>';
+    });
+    yearSelect.innerHTML = yearHtml;
+    
+    // Attach Event Listeners
+    sortSelect.addEventListener('change', function() { applyFilters(1); });
+    catSelect.addEventListener('change', function() { applyFilters(1); });
+    yearSelect.addEventListener('change', function() { applyFilters(1); });
+    monthSelect.addEventListener('change', function() { applyFilters(1); });
+  }
+
+  function applyFilters(page) {
+    page = page || 1;
+    var sortVal = document.getElementById('filterSort') ? document.getElementById('filterSort').value : 'newest';
+    var catVal = document.getElementById('filterCat') ? document.getElementById('filterCat').value : 'all';
+    var yearVal = document.getElementById('filterYear') ? document.getElementById('filterYear').value : 'all';
+    var monthVal = document.getElementById('filterMonth') ? document.getElementById('filterMonth').value : 'all';
+    
+    var filtered = allExperiencesData.filter(function(exp) {
+      // Category Match
+      var matchCat = true;
+      if (catVal !== 'all') {
+        matchCat = exp.categories && exp.categories.includes(catVal);
+      }
+      
+      // Date Match
+      var matchDate = true;
+      var expYear = null;
+      var expMonth = null;
+      if (exp.activity_date) {
+        var parts = exp.activity_date.split('-');
+        expYear = parts[0];
+        expMonth = parts[1];
+      }
+      
+      if (yearVal !== 'all' && expYear !== yearVal) matchDate = false;
+      if (monthVal !== 'all' && expMonth !== monthVal) matchDate = false;
+      
+      return matchCat && matchDate;
+    });
+    
+    // Sort
+    filtered.sort(function(a, b) {
+      var dateA = new Date(a.activity_date || a.created_at || 0).getTime();
+      var dateB = new Date(b.activity_date || b.created_at || 0).getTime();
+      return sortVal === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+    
+    renderExperiences(filtered, page);
+  }
+
   // Try loading from Supabase, fallback to dummy
   async function loadExperiences() {
     if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
@@ -453,19 +543,27 @@
           .order('created_at', { ascending: false });
         
         if (!error && data && data.length > 0) {
-          renderExperiences(data);
+          allExperiencesData = data;
+          initFilters();
+          applyFilters(1);
           updateHeroGrid(data);
         } else {
-          renderExperiences(dummyExperiences);
+          allExperiencesData = dummyExperiences;
+          initFilters();
+          applyFilters(1);
           updateHeroGrid(dummyExperiences);
         }
       } catch (e) {
         console.warn('Supabase error, using fallback data:', e);
-        renderExperiences(dummyExperiences);
+        allExperiencesData = dummyExperiences;
+        initFilters();
+        applyFilters(1);
         updateHeroGrid(dummyExperiences);
       }
     } else {
-      renderExperiences(dummyExperiences);
+      allExperiencesData = dummyExperiences;
+      initFilters();
+      applyFilters(1);
       updateHeroGrid(dummyExperiences);
     }
   }
