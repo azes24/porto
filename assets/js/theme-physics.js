@@ -36,6 +36,7 @@
   let isDragging = false;
   let dragOffset = { x: 0, y: 0 };
   let hasTriggered = false;
+  let isPrimed = false;
 
   // Scroll momentum tracking
   let lastScrollY = window.scrollY;
@@ -68,6 +69,7 @@
   function startDrag(clientX, clientY) {
     isDragging = true;
     hasTriggered = false;
+    isPrimed = false;
 
     const rect = svg.getBoundingClientRect();
     const svgX = clientX - rect.left;
@@ -95,6 +97,15 @@
     isDragging = false;
     handle.setAttribute('stroke', 'var(--accent-blue)');
     handle.setAttribute('r', '12');
+
+    // Trigger theme toggle if it was pulled all the way down
+    if (isPrimed && !hasTriggered) {
+      hasTriggered = true;
+      toggleTheme();
+      switchVy = -15; // Kick the switch up (haptic feedback)
+      velocity.y = -5; // Kick the handle up slightly
+    }
+    isPrimed = false;
   }
 
   function toggleTheme() {
@@ -191,17 +202,21 @@
     // 4. Clamp Switch
     if (switchY > maxPullY) {
       switchY = maxPullY;
-      // If pulled to max and hasn't triggered yet, toggle!
-      if (!hasTriggered && distance >= stringLength - 1) {
-        hasTriggered = true;
-        toggleTheme();
-
-        // Give a little haptic feedback kick (simulate switch snapping)
-        switchVy = -15;
-        if (!isDragging) {
+      if (distance >= stringLength - 1) {
+        if (isDragging) {
+          // Prime the switch to toggle on release
+          isPrimed = true;
+        } else if (!hasTriggered) {
+          // If pulled by scroll or momentum, toggle instantly
+          hasTriggered = true;
+          toggleTheme();
+          switchVy = -15;
           velocity.y = -5;
         }
       }
+    } else {
+      // If user pushes it back up before releasing, unprime it
+      if (isDragging) isPrimed = false;
     }
 
     // Render
