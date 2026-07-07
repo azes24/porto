@@ -19,9 +19,10 @@
   const anchorX = 30;               // Fixed horizontal anchor
   const switchRestY = -20;          // Resting position of the switch (top of string)
   const maxPullY = 20;              // Maximum downward pull of the switch
-  const stringLength = 100;         // Fixed length of the inelastic string
-  const gravity = 1.2;              // Gravity force
-  const friction = 0.97;            // Air friction / damping (higher = swings longer)
+  const stringLength = 150;         // Fixed length of the inelastic string
+  let gravityX = 0;                 // Horizontal gravity (from device orientation)
+  let gravityY = 0.6;               // Vertical gravity (reduced for slower swing)
+  const friction = 0.98;            // Air friction / damping (higher = swings longer)
   const switchSpring = 0.2;         // Spring constant for the switch
   const scrollForceMult = 0.15;     // How much scroll affects the handle
 
@@ -39,6 +40,18 @@
   // Scroll momentum tracking
   let lastScrollY = window.scrollY;
   let scrollVelocity = 0;
+
+  // Device Orientation for Gravity (Mobile)
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', (event) => {
+      let gamma = event.gamma; // Left-to-right tilt in degrees [-90, 90]
+      if (gamma !== null) {
+        // Clamp to [-60, 60] to avoid extreme forces, then map to gravity magnitude
+        let clampedGamma = Math.max(-60, Math.min(60, gamma));
+        gravityX = (clampedGamma / 60) * gravityY * 1.5; // Multiply by 1.5 for slightly stronger horizontal effect
+      }
+    }, { passive: true });
+  }
 
   window.addEventListener('scroll', () => {
     let currentScroll = window.scrollY;
@@ -122,7 +135,8 @@
 
     // 2. Handle Physics
     if (!isDragging) {
-      velocity.y += gravity;
+      velocity.x += gravityX;
+      velocity.y += gravityY;
       velocity.x *= friction;
       velocity.y *= friction;
       
