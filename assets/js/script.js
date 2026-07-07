@@ -571,18 +571,24 @@
   loadExperiences();
 
   // Modal Close Logic
-  var modal = document.getElementById('expModal');
-  var closeBtn = document.getElementById('modalClose');
-  if (modal && closeBtn) {
-    function closeModal() {
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
+  function initModal() {
+    var modal = document.getElementById('expModal');
+    var closeBtn = document.getElementById('modalClose');
+    if (modal && closeBtn) {
+      function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      closeBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+      });
     }
-    closeBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) closeModal();
-    });
   }
+
+  // Call on load and on component load
+  initModal();
+  document.addEventListener('componentsLoaded', initModal);
 })();
 
 

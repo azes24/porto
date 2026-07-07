@@ -1,0 +1,26 @@
+<!-- Modal Popup for Experience -->
+<div class="modal-overlay" id="expModal">
+  <div class="modal-content glass">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div class="modal-body">
+      <div class="modal-gallery" id="modalGallery">
+        <!-- Images will be inserted here dynamically -->
+      </div>
+      <div class="modal-details">
+        <h2 id="modalTitle" class="gradient-text">Title</h2>
+        <div id="modalDate" class="exp-date" style="margin-top: 0.5rem; display: inline-block;">Date</div>
+        <div id="modalCategories" class="exp-categories" style="margin-bottom: 0.5rem;"></div>
+        <h4 id="modalCompany" style="margin-top: 0.5rem;">Company</h4>
+        <div class="exp-location" style="margin-top: 10px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span id="modalLocation">Location</span>
+        </div>
+        <p id="modalDesc" style="margin-top: 20px; line-height: 1.7; color: var(--text-secondary);">Description goes here.</p>
+      </div>
+    </div>
+  </div>
+</div>
