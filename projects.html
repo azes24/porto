@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects | AZIZSY.</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233b82f6'/><text x='50' y='72' font-family='sans-serif' font-size='65' font-weight='bold' fill='white' text-anchor='middle'>A</text></svg>">
+  <meta name="description"
+    content="Projects of AZIZSY – Creative Developer & Designer crafting interactive web experiences.">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body data-page="projects">
+
+  <!-- Dynamic Components Placeholders -->
+  <div id="cursor-placeholder"></div>
+  <div id="navbar-placeholder"></div>
+  <!-- Floating Particles Background -->
+  <canvas id="particles-canvas"></canvas>
+
+  <div id="theme-toggle-placeholder"></div>
+
+  <!-- Projects Section -->
+  <section class="section" id="projects" style="padding-top: 8rem; min-height: 80vh;">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2 class="gradient-text">Featured Projects</h2>
+        <p>Aplikasi dan karya digital yang telah saya bangun.</p>
+      </div>
+
+      <!-- Project Filter Bar -->
+      <div class="project-filter-bar reveal" id="projectFilterBar">
+        <button class="filter-tab active" data-filter="all">All Projects</button>
+        <button class="filter-tab" data-filter="webapp">Web App</button>
+        <button class="filter-tab" data-filter="fullstack">Fullstack</button>
+        <button class="filter-tab" data-filter="creative">Creative & Editing</button>
+        <button class="filter-tab" data-filter="iot">IoT & System</button>
+      </div>
+
+      <!-- Projects Grid -->
+      <div class="projects-grid" id="projects-container">
+        <!-- Loaded by JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <div id="modal-placeholder"></div>
+  <div id="footer-placeholder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://xufdsahxomccepetmdgu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_7Kv04furGIBlg3rkDqIZfA_Y3OrWWaJ';
+    const SUPABASE_BUCKET = 'portfolio-images';
+    let _sb = null;
+    function getSupabase() {
+      if (!_sb && SUPABASE_URL !== 'ISI_SUPABASE_URL_DISINI') {
+        _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+      return _sb;
+    }
+    function isSupabaseConfigured() {
+      return SUPABASE_URL !== 'ISI_SUPABASE_URL_DISINI' && SUPABASE_ANON_KEY !== 'ISI_SUPABASE_ANON_KEY_DISINI';
+    }
+  </script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/theme-physics.js"></script>
+</body>
+
+</html>

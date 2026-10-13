@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
-<body>
+<body data-page="home">
 
   <!-- Dynamic Components Placeholders -->
   <div id="cursor-placeholder"></div>
@@ -37,9 +37,9 @@
       <!-- Profile Photo (Left) — natural cutout, no frame -->
       <div class="profile-card" id="profileCard">
         <div class="profile-photo" id="profileFrame">
-          <img src="assets/img/profil (0).png" alt="Profile Photo" class="profile-img active" data-index="0">
-          <img src="assets/img/profil (1).png" alt="Profile Photo" class="profile-img" data-index="1">
-          <img src="assets/img/profil (2).png" alt="Profile Photo" class="profile-img" data-index="2">
+          <img src="assets/img/profil-0.png" alt="Profile Photo" class="profile-img active" data-index="0">
+          <img src="assets/img/profil-1.png" alt="Profile Photo" class="profile-img" data-index="1">
+          <img src="assets/img/profil-2.png" alt="Profile Photo" class="profile-img" data-index="2">
           <div class="profile-fade"></div>
         </div>
         <div class="profile-dots" id="profileDots">
@@ -52,27 +52,27 @@
       <!-- Experience Photo Grid (Right) -->
       <div class="exp-grid" id="expGrid">
         <div class="exp-grid-item" data-index="0">
-          <img src="assets/img/exp-1.png" alt="Experience 1" loading="lazy">
+          <img src="assets/img/proj-academic.jpg" alt="UTM Smart Academic Portal" loading="lazy">
           <div class="exp-grid-overlay">
-            <span>Project 01</span>
+            <span>Academic Portal</span>
           </div>
         </div>
         <div class="exp-grid-item" data-index="1">
-          <img src="assets/img/exp-2.png" alt="Experience 2" loading="lazy">
+          <img src="assets/img/proj-fintech.jpg" alt="NovaPay Financial Dashboard" loading="lazy">
           <div class="exp-grid-overlay">
-            <span>Project 02</span>
+            <span>FinTech Analytics</span>
           </div>
         </div>
         <div class="exp-grid-item" data-index="2">
-          <img src="assets/img/exp-3.png" alt="Experience 3" loading="lazy">
+          <img src="assets/img/proj-creative.jpg" alt="Azes Creative Studio" loading="lazy">
           <div class="exp-grid-overlay">
-            <span>Project 03</span>
+            <span>Creative Studio</span>
           </div>
         </div>
         <div class="exp-grid-item" data-index="3">
-          <img src="assets/img/exp-1.png" alt="Experience 4" loading="lazy">
+          <img src="assets/img/proj-iot.jpg" alt="AgriFlow IoT Environmental System" loading="lazy">
           <div class="exp-grid-overlay">
-            <span>Project 04</span>
+            <span>AgriFlow IoT</span>
           </div>
         </div>
       </div>
@@ -106,6 +106,47 @@
       </div>
     </div>
   </section>
+
+  <!-- Projects Section (Featured 3) -->
+  <section class="section" id="projects">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2 class="gradient-text">Featured Projects</h2>
+        <p>Aplikasi dan karya digital pilihan yang telah saya bangun.</p>
+      </div>
+
+      <!-- Projects Grid (Loaded by JavaScript - 3 items) -->
+      <div class="projects-grid" id="projects-container"></div>
+
+      <div style="text-align: center; margin-top: 2rem;" class="reveal">
+        <a href="projects.html" class="btn btn-primary-glow" style="padding: 0.6rem 1.6rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+          Lihat Semua Project
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certificates Section (Featured 3) -->
+  <section class="section" id="certificates">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2 class="gradient-text">Certificates & Achievements</h2>
+        <p>Sertifikasi dan pencapaian profesional terverifikasi.</p>
+      </div>
+
+      <!-- Certificates Grid (Loaded by JavaScript - 3 items) -->
+      <div class="certificates-grid" id="certificates-container"></div>
+
+      <div style="text-align: center; margin-top: 2rem;" class="reveal">
+        <a href="certificates.html" class="btn btn-primary-glow" style="padding: 0.6rem 1.6rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+          Lihat Semua Sertifikat
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
 
   <!-- Contact Section -->
   <section class="contact-section" id="contact">
